@@ -1,0 +1,39 @@
+autoinstall:
+  version: 1
+  locale: en_US
+  keyboard:
+    layout: us
+    variant: ''
+  timezone: America/Chicago
+  identity:
+    hostname: ubuntu-machine # Will be changed in Late Commands
+    username: [Admin Account Name]
+    password: "[HASHED PASSWORD]"
+  ssh:
+    install-server: true
+  storage:
+    layout:
+      name: lvm
+      sizing-policy: all
+  packages: #Add any packages you with to preinstall during set-up here
+    - curl
+    - gnupg
+  user-data:
+    groups:
+      - standarduser
+    users:
+      - name: [Account Name]
+        gecos: [Account Group]
+        shell: /bin/bash
+        primary_group: standarduser
+        groups: sudo
+        lock_passwd: false
+        passwd: '[HASHED PASSSWORD]'
+    chpasswd:
+      expire: false
+
+    runcmd:
+      - chage -d 0 instructor
+
+  late-commands:
+    - curtin in-target -- bash -c "SERIAL=\$(dmidecode -s system-serial-number | tr -d '[:space:]'); hostnamectl set-hostname 223-\$SERIAL; echo 223-\$SERIAL > /etc/hostname; sed -i 's/127.0.1.1.*/127.0.1.1 223-\$SERIAL/' /etc/hosts"
